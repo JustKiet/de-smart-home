@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from .common.control_base import BaseControl
 
-class LightGateway(BaseControl):
+class ControlLight(BaseControl):
     """Abstract class for light devices"""
 
     @abstractmethod

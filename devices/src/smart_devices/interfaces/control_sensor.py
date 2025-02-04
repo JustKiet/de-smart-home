@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from .common.control_base import BaseControl 
 
-class SensorGateway(BaseControl):
+class ControlSensor(BaseControl):
     """Abtsract class for sensor devices"""
     
     @abstractmethod

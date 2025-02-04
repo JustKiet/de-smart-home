@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from .common.control_base import BaseControl
 
-class AirConditionerGateway(BaseControl):
+class ControlAirConditioner(BaseControl):
     """Abstract class for air conditioner devices"""
 
 
