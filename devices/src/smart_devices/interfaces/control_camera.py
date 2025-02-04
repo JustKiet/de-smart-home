@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
-from .base_gateway import BaseGateway
+from .common.control_base import BaseControl
 
-class CameraGateway(BaseGateway):
+class CameraGateway(BaseControl):
     """Abstract class for camera devices"""
 
     @abstractmethod

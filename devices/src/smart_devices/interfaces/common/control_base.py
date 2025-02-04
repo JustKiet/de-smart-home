@@ -1,7 +1,18 @@
 from abc import ABC, abstractmethod
 
-class BaseGateway(ABC):
+class BaseControl(ABC):
     """Abstract class for gateway devices"""
+
+    @abstractmethod
+    def turn_on(self):
+        """Turn on the device"""
+        pass
+    
+    @abstractmethod
+    def turn_off(self):
+        """Turn off the device"""
+        pass
+    
 
     @abstractmethod
     def connect(self):
