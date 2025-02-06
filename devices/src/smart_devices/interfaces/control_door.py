@@ -23,10 +23,3 @@ class ControlDoor(ABC):
     def log_activity(self, activity: str) -> None:
         pass
 
-    @abstractmethod
-    def integrate_human_counter(self, human_counter: HumanCounter) -> None:
-        pass
-
-    @abstractmethod
-    def integrate_id_detection(self, id_detection: IdDetection) -> None:
-        pass
