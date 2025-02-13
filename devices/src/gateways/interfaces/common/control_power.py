@@ -8,6 +8,10 @@ class ControlPower(ABC):
     - `turn_off` -- Turn off the device
     """
     @abstractmethod
+    def is_turned_on(self):
+        raise NotImplementedError
+    
+    @abstractmethod
     def turn_on(self):
         raise NotImplementedError
     
