@@ -1,15 +1,19 @@
-from abc import ABC, abstractmethod
-
-class ControlSpeaker(ABC):
+from abc import abstractmethod
+from devices.src.gateways.interfaces.common.device_status import DeviceStatus
+from devices.src.gateways.interfaces.common.control_power import ControlPower
+class ControlSpeaker(ControlPower, DeviceStatus):
     """An interface for controlling speaker devices.
     
     Methods:
+    - `turn_on` -- Turn on the speaker.
+    - `turn_off` -- Turn off the speaker.
+    - `get_status` -- Get the status of the speaker.
     - `set_volume` -- Set the volume of the speaker.
-    - `control_bass` -- Control the bass of the speaker.
-    - `control_treble` -- Control the treble of the speaker.
     - `mute` -- Mute the speaker.
     - `unmute` -- Unmute the speaker.
-    - `play_audio` -- Play audio from the speaker.
+    - `play_from_file` -- Play audio from a file.
+    - `play_from_url` -- Play audio from a URL.
+    - `play_audio_bytes` -- Play audio bytes from the speaker.
     - `stop_audio` -- Stop audio from the speaker.
     - `pause_audio` -- Pause audio from the speaker.
     - `resume_audio` -- Resume audio from the speaker.
@@ -17,14 +21,6 @@ class ControlSpeaker(ABC):
     """
     @abstractmethod
     def set_volume(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def control_bass(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def control_treble(self):
         raise NotImplementedError
     
     @abstractmethod
@@ -36,7 +32,7 @@ class ControlSpeaker(ABC):
         raise NotImplementedError
     
     @abstractmethod
-    def play_audio(self):
+    async def play_audio(self):
         raise NotImplementedError
     
     @abstractmethod
@@ -49,8 +45,4 @@ class ControlSpeaker(ABC):
     
     @abstractmethod
     def resume_audio(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def get_audio(self):
         raise NotImplementedError
