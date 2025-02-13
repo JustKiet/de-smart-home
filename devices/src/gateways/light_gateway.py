@@ -1,6 +1,6 @@
 
 from typing import List, Union
-from devices.src.smart_devices.light.device_light import LightDevice
+from devices.src.smart_devices.device_light import LightDevice
 
 class LightGateway:
     def __init__(self, light_devices: List[LightDevice]):

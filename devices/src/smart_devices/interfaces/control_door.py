@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
-from devices.src.gateways.door.components.door_gateway import HumanCounter, IdDetection
+from devices.src.gateways.door_gateway import HumanCounter, IdDetection
 
 class ControlDoor(ABC):
     def __init__(self, connected_sensors: List[Any], gateway_status: bool):

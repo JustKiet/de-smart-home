@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Union
 
-from devices.src.smart_devices.ac.device_ac import ACDevice
+from devices.src.smart_devices.device_ac import ACDevice
 
 
 class ACGateway:
