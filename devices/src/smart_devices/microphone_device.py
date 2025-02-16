@@ -7,14 +7,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import traceback
 from starlette.websockets import WebSocketDisconnect
+from typing import Optional, Literal
 class MicrophoneDevice(ControlMicrophone):
-    def __init__(self, device_id: str, gateway_url: str):
+    def __init__(self, device_id: str):
         super().__init__()
         self._state = 'off'
         self._muted = False
-        self.device_id = f"microphone_{device_id}"
+        self._device_id = f"microphone_{device_id}"
         self._pyaudio = pyaudio.PyAudio()
-        self.gateway_url = gateway_url
         self._streaming = False
         self._thread = None
         self._format = pyaudio.paInt16
@@ -30,24 +30,27 @@ class MicrophoneDevice(ControlMicrophone):
             input=True,
             frames_per_buffer=self._chunk_size
         )
-        
+
+    def get_device_id(self):
+        return self._device_id
+          
     def is_turned_on(self):
         """Check if the microphone is turned on."""
         if self._state == 'on':
             return True
         else:
-            raise Exception(f"{self.device_id} | Microphone is turned off. Please turn the device on first.")
+            raise Exception(f"{self._device_id} | Microphone is turned off. Please turn the device on first.")
     
     def turn_on(self):
         """Turn on the microphone."""
         self._state = 'on'
-        logger.info(f"{self.device_id} | Microphone turned on.")
+        logger.info(f"{self._device_id} | Microphone turned on.")
         return self.get_status()
     
     def turn_off(self):
         """Turn off the microphone."""
         self._state = 'off'
-        logger.info(f"{self.device_id} | Microphone turned off.")
+        logger.info(f"{self._device_id} | Microphone turned off.")
         return self.get_status()
     
     def mute(self):
@@ -55,7 +58,7 @@ class MicrophoneDevice(ControlMicrophone):
         self.is_turned_on()
         
         self._muted = True
-        logger.info(f"{self.device_id} | Microphone muted.")
+        logger.info(f"{self._device_id} | Microphone muted.")
         return self.get_status()
     
     def unmute(self):
@@ -63,7 +66,7 @@ class MicrophoneDevice(ControlMicrophone):
         self.is_turned_on()
         
         self._muted = False
-        logger.info(f"{self.device_id} | Microphone unmuted.")
+        logger.info(f"{self._device_id} | Microphone unmuted.")
         return self.get_status()
     
     async def capture_audio(self, websocket: WebSocket):
@@ -79,14 +82,14 @@ class MicrophoneDevice(ControlMicrophone):
                 if not self._muted:
                     data = stream.read(1024, exception_on_overflow=False)
                     try:
-                        logger.info(f"{self.device_id} | Sending {len(data)} bytes of audio data.")
+                        logger.info(f"{self._device_id} | Sending {len(data)} bytes of audio data.")
                         await websocket.send_bytes(data)
                     except WebSocketDisconnect:
-                        logger.warning(f"{self.device_id} | WebSocket client disconnected. Stopping audio stream.")
+                        logger.warning(f"{self._device_id} | WebSocket client disconnected. Stopping audio stream.")
                         break
         except Exception as e:
-            logger.error(f"{self.device_id} | Error capturing audio: {e}")
-            logger.error(f"{self.device_id} | {traceback.format_exc()}")
+            logger.error(f"{self._device_id} | Error capturing audio: {e}")
+            logger.error(f"{self._device_id} | {traceback.format_exc()}")
         finally:
             stream.stop_stream()
             stream.close()
@@ -103,7 +106,7 @@ class MicrophoneDevice(ControlMicrophone):
                 await asyncio.sleep(0.02)  # Simulate processing delay
 
         except Exception as e:
-            logger.error(f"{self.device_id} | Error recording audio: {e}")
+            logger.error(f"{self._device_id} | Error recording audio: {e}")
         finally:
             self.stream.stop_stream()
             self.stream.close()
@@ -114,22 +117,28 @@ class MicrophoneDevice(ControlMicrophone):
         """Pause the audio stream."""
         self.is_turned_on()
         self._pause_event.clear()
-        logger.error(f"{self.device_id} | Audio stream paused.")
+        logger.error(f"{self._device_id} | Audio stream paused.")
         return self.get_status()
     
     def resume_audio(self):
         """Resume the audio stream."""
         self.is_turned_on()
         self._pause_event.set()
-        logger.error(f"{self.device_id} | Audio stream resumed.")
+        logger.error(f"{self._device_id} | Audio stream resumed.")
         return self.get_status()
     
-    def get_status(self):
+    def get_status(self, attribute: Optional[Literal["state", "muted", "streaming", "format", "channels", "rate", "chunk_size"]] = None):
         """Get device status."""
         self.is_turned_on()
         
+        if attribute:
+            return {
+                'device_id': self._device_id,
+                attribute: getattr(self, f"_{attribute}")
+            }
+        
         return {
-            'device_id': self.device_id,
+            'device_id': self._device_id,
             'state': self._state,
             'muted': self._muted,
             'streaming': self._streaming,
@@ -138,5 +147,4 @@ class MicrophoneDevice(ControlMicrophone):
             'channels': self._channels,
             'rate': self._rate,
             'chunk_size': self._chunk_size,
-            'gateway_url': self.gateway_url
         }

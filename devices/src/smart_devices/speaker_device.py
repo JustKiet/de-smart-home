@@ -1,22 +1,18 @@
 from devices.src.smart_devices.interfaces.control_speaker import ControlSpeaker
 import pyaudio
-import wave
-import requests
 import threading
-from fastapi import FastAPI, WebSocket
-from typing import Literal
+from typing import Literal, Optional
 import sounddevice as sd
 import numpy as np
 from loguru import logger
-import librosa
-import time
+
 class SpeakerDevice(ControlSpeaker):
     def __init__(self, device_id: str):
         super().__init__()
         self._state = 'off'
         self._volume = 1.0
         self._muted = False
-        self.device_id = f"speaker_{device_id}"
+        self._device_id = f"speaker_{device_id}"
         self._audio_status: Literal['playing', 'paused', 'stopped'] = 'stopped'
         self._pause_event = threading.Event()
         self._pause_event.set()
@@ -37,37 +33,40 @@ class SpeakerDevice(ControlSpeaker):
             frames_per_buffer=self._chunk_size
         )
         
+    def get_device_id(self):
+        return self._device_id
+        
     def is_turned_on(self):
         if self._state == 'on':
             return True
         else:
-            raise Exception(f"{self.device_id} | Speaker is turned off. Please turn the device on first.")
+            raise Exception(f"{self._device_id} | Speaker is turned off. Please turn the device on first.")
         
     def turn_on(self):
         self._state = 'on'
-        return self.get_status()
+        return self.get_status(attribute='state')
         
     def turn_off(self):
         self._state = 'off'
         self.stream.stop_stream()
         self.stream.close()
         self.p.terminate()
-        return self.get_status()
+        return self.get_status(attribute='state')
     
     def set_volume(self, value: int):
         self.is_turned_on()
         self._volume = value
-        return self.get_status()
+        return self.get_status(attribute='volume')
     
     def mute(self):
         self.is_turned_on()
         self._muted = True
-        return self.get_status()
+        return self.get_status(attribute='muted')
     
     def unmute(self):
         self.is_turned_on()
         self._muted = False
-        return self.get_status()
+        return self.get_status(attribute='muted')
 
     def play_audio(self, audio_data):
         """Play audio using PyAudio with support for pause and mute."""
@@ -122,7 +121,7 @@ class SpeakerDevice(ControlSpeaker):
         self._audio_status = 'stopped'
         self._pause_event.set()
         self._streaming = False
-        return self.get_status()
+        return self.get_status(attribute='audio_status')
     
     def pause_audio(self):
         self.is_turned_on()
@@ -130,7 +129,7 @@ class SpeakerDevice(ControlSpeaker):
         if self._audio_status == 'playing':
             self._audio_status = 'paused'
             self._pause_event.clear()
-        return self.get_status()
+        return self.get_status(attribute='audio_status')
     
     def resume_audio(self):
         self.is_turned_on()
@@ -138,14 +137,21 @@ class SpeakerDevice(ControlSpeaker):
         if self._audio_status == 'paused':
             self._audio_status = 'playing'
             self._pause_event.set()
-        return self.get_status()
+        return self.get_status(attribute='audio_status')
     
-    def get_status(self):
+    def get_status(self, attribute: Optional[Literal['state','device_power', 'muted', 'volume', 'audio_status', 'streaming']]):
         """Get the current status of the speaker."""
         self.is_turned_on()
         
+        if attribute:
+            return {
+                'device_id': self._device_id,
+                attribute: getattr(self, f"_{attribute}")
+            }
+        
         return {
-            'device_id': self.device_id,
+            'device_id': self._device_id,
+            'state': self._state,
             'device_power': self._state,
             'muted': self._muted,
             'volume': self._volume,

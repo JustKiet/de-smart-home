@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
+from devices.src.smart_devices.interfaces.common.control_power import ControlPower
+from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
 
-class ControlSpeaker(ABC):
+class ControlSpeaker(ControlPower,
+                     DeviceStatus):
     """An interface for controlling speaker devices.
     
     Methods:
@@ -17,14 +20,6 @@ class ControlSpeaker(ABC):
     """
     @abstractmethod
     def set_volume(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def control_bass(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def control_treble(self):
         raise NotImplementedError
     
     @abstractmethod
@@ -49,8 +44,4 @@ class ControlSpeaker(ABC):
     
     @abstractmethod
     def resume_audio(self):
-        raise NotImplementedError
-    
-    @abstractmethod
-    def get_audio(self):
         raise NotImplementedError

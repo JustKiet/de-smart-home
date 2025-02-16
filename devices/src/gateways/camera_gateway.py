@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+# TODO: Rework this class. Wrong directory and wrong naming convention
+
 class Frame:
     # Assuming Frame is a predefined class
     pass

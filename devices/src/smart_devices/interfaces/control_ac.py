@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
-from .common.control_base import BaseControl
+from devices.src.smart_devices.interfaces.common.control_power import ControlPower
+from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
 from typing import List, Union, Literal
 
-class ControlAirConditioner(BaseControl):
+class ControlAirConditioner(ControlPower,
+                            DeviceStatus):
     """Abstract class for air conditioner devices"""
 
 

@@ -1,5 +1,11 @@
 from devices.src.smart_devices.interfaces.common.control_power import ControlPower
 from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
+from devices.src.smart_devices.interfaces.control_microphone import ControlMicrophone
+from devices.src.smart_devices.interfaces.control_speaker import ControlSpeaker
+from devices.src.smart_devices.microphone_device import MicrophoneDevice
+from devices.src.smart_devices.speaker_device import SpeakerDevice
+
+from typing import List
 from fastapi import WebSocket
 import websockets
 from loguru import logger
@@ -8,6 +14,8 @@ import traceback
 from openai import OpenAI
 import io
 import wave
+
+from backend.src.config import SPEAKER_SERVER_URL
 
 class SpeechProcessor:
     """A Speech Processor class to handle speech processing related tasks."""
@@ -67,42 +75,38 @@ class NamedBytesIO(io.BytesIO):
         super().__init__(*args, **kwargs)
         self.name = name
 
-class AudioGateway(SpeechProcessor,
-                   ControlPower,
-                   DeviceStatus):
+class AudioGateway(SpeechProcessor):
     def __init__(self,
-                 device_id: str,
-                 speaker_server_url: str,
                  client: OpenAI):
         super().__init__(client)
-        self._state = 'off'
-        self.device_id = f"audio_gateway_{device_id}"
-        self.speaker_server_url = speaker_server_url
+        self.microphones = {}
+        self.speakers = {}
+        self.speaker_server_url = SPEAKER_SERVER_URL
         self.websocket = None
-    
-    def is_turned_on(self):
-        if self._state == 'on':
-            return True
-        else:
-            raise Exception(f"{self.device_id} | AudioGateway is turned off. Please turn the device on first.")
-    
-    def turn_on(self):
-        self._state = 'on'
-        return self.get_status()
-    
-    def turn_off(self):
-        self._state = 'off'
-        return self.get_status()
 
     async def connect_speaker(self):
         """Establish a persistent WebSocket connection to the speaker."""
         try:
             self.websocket = await websockets.connect(self.speaker_server_url)
-            logger.info(f"{self.device_id} | Connected to Speaker WebSocket.")
+            logger.info(f"Connected to Speaker WebSocket.")
         except Exception as e:
-            logger.error(f"{self.device_id} | Failed to connect to speaker: {e}")
+            logger.error(f"Failed to connect to speaker: {e}")
             self.websocket = None
             
+    def add_microphone(self, device_id: str):
+        self.microphones[device_id] = MicrophoneDevice(device_id)
+        self.microphones[device_id].turn_on()
+        
+    def get_microphone(self, device_id: str):
+        return self.microphones.get(device_id, None)
+    
+    def add_speaker(self, device_id: str):
+        self.speakers[device_id] = SpeakerDevice(device_id)
+        self.speakers[device_id].turn_on()
+        
+    def get_speaker(self, device_id: str):
+        return self.speakers.get(device_id, None)
+    
     async def send_audio(self, audio_data: bytes, client: OpenAI):
         """Send audio data to the Speaker WebSocket."""
         if not self.websocket or self.websocket.close_code is not None:
@@ -115,15 +119,15 @@ class AudioGateway(SpeechProcessor,
         wav_bytes = self.raw_bytes_to_wav(audio_data)
         
         if self.validate_wav(wav_bytes):
-            logger.debug(f"{self.device_id} | Converted {len(audio_data)} bytes to WAV")
+            logger.debug(f"Converted {len(audio_data)} bytes to WAV")
         else:
-            logger.error(f"{self.device_id} | Invalid audio data. Skipping...")
+            logger.error(f"Invalid audio data. Skipping...")
             return
         
         wav_file = NamedBytesIO(wav_bytes.getvalue(), name="audio.wav")
         
-        transcript = self.speech_to_text(wav_file, client)
-        logger.info(f"{self.device_id} | Transcript: {transcript}")
+        transcript = self.speech_to_text(wav_file)
+        logger.info(f"Transcript: {transcript}")
         
         # -----------------------------------------------------------------------------
         
@@ -131,13 +135,13 @@ class AudioGateway(SpeechProcessor,
         if self.websocket:
             try:
                 await self.websocket.send(audio_data)
-                logger.info(f"{self.device_id} | Sent {len(audio_data)} bytes to Speaker WebSocket")
+                logger.info(f"Sent {len(audio_data)} bytes to Speaker WebSocket")
             except websockets.exceptions.ConnectionClosed:
-                logger.error(f"{self.device_id} | Speaker WebSocket closed unexpectedly. Reconnecting...")
+                logger.error(f"Speaker WebSocket closed unexpectedly. Reconnecting...")
                 self.websocket = None
             except Exception as e:
                 traceback.print_exc()
-                logger.error(f"{self.device_id} | Error sending audio to speaker: {e}")
+                logger.error(f"Error sending audio to speaker: {e}")
                 
     def get_status(self):
         return {

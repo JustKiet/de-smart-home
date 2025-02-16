@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
+# TODO: Rework this class. Wrong directory and wrong naming convention
 class HumanCounter(ABC):
     def __init__(self, current_count: int, sensor_status: bool, location: str):
         self.current_count = current_count
