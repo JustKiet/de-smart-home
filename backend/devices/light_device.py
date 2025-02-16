@@ -1,5 +1,5 @@
 from typing import Literal
-from devices.src.smart_devices.interfaces.control_light import ControlLight
+from backend.devices.interfaces.control_light import ControlLight
 
 class LightDevice(ControlLight):
     def __init__(self, device_id):
@@ -8,7 +8,8 @@ class LightDevice(ControlLight):
         self._brightness = 100
         self._temperature = 3000
         
-    def get_device_id(self):
+    @property
+    def device_id(self):
         return self._device_id
         
     def is_turned_on(self) -> bool:

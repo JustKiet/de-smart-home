@@ -2,12 +2,13 @@ import pyaudio
 import asyncio
 import threading
 from fastapi import FastAPI, WebSocket
-from devices.src.smart_devices.interfaces.control_microphone import ControlMicrophone
+from backend.devices.interfaces.control_microphone import ControlMicrophone
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import traceback
 from starlette.websockets import WebSocketDisconnect
 from typing import Optional, Literal
+
 class MicrophoneDevice(ControlMicrophone):
     def __init__(self, device_id: str):
         super().__init__()
@@ -30,6 +31,10 @@ class MicrophoneDevice(ControlMicrophone):
             input=True,
             frames_per_buffer=self._chunk_size
         )
+    
+    @property    
+    def device_id(self):
+        return self._device_id
 
     def get_device_id(self):
         return self._device_id

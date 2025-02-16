@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from devices.src.smart_devices.interfaces.common.control_power import ControlPower
-from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
+from backend.devices.interfaces.common.control_power import ControlPower
+from backend.devices.interfaces.common.device_status import DeviceStatus
 from typing import List, Union, Literal
 
 class ControlAirConditioner(ControlPower,

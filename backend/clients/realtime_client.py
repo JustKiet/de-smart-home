@@ -1,7 +1,7 @@
 import asyncio
 import websockets
 from loguru import logger
-from devices.src.smart_devices.microphone_device import MicrophoneDevice
+from backend.devices.microphone_device import MicrophoneDevice
 from config import MICROPHONE_SERVER_URL
 
 async def websocket_client():

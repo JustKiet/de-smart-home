@@ -1,9 +1,8 @@
 from fastapi import APIRouter, WebSocket
 import asyncio
 from loguru import logger
-from devices.src.smart_devices.speaker_device import SpeakerDevice
+from backend.devices.speaker_device import SpeakerDevice
 import traceback
-
 
 router = APIRouter()
 speaker = SpeakerDevice("1")
@@ -17,8 +16,6 @@ async def speaker_stream(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_bytes()
-            #logger.info(f"Received {len(data)} bytes of audio data.")
-            logger.debug(f"data type: {type(data)}")
             if isinstance(data, bytes):
                 speaker.play_audio(data)
             else:

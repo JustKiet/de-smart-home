@@ -1,4 +1,4 @@
-from devices.src.smart_devices.interfaces.control_speaker import ControlSpeaker
+from backend.devices.interfaces.control_speaker import ControlSpeaker
 import pyaudio
 import threading
 from typing import Literal, Optional
@@ -33,7 +33,8 @@ class SpeakerDevice(ControlSpeaker):
             frames_per_buffer=self._chunk_size
         )
         
-    def get_device_id(self):
+    @property
+    def device_id(self):
         return self._device_id
         
     def is_turned_on(self):

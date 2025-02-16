@@ -1,9 +1,5 @@
-from devices.src.smart_devices.interfaces.common.control_power import ControlPower
-from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
-from devices.src.smart_devices.interfaces.control_microphone import ControlMicrophone
-from devices.src.smart_devices.interfaces.control_speaker import ControlSpeaker
-from devices.src.smart_devices.microphone_device import MicrophoneDevice
-from devices.src.smart_devices.speaker_device import SpeakerDevice
+from backend.devices.interfaces.control_microphone import ControlMicrophone
+from backend.devices.interfaces.control_speaker import ControlSpeaker
 
 from typing import List
 from fastapi import WebSocket
@@ -15,7 +11,7 @@ from openai import OpenAI
 import io
 import wave
 
-from backend.src.config import SPEAKER_SERVER_URL
+from backend.config import SPEAKER_SERVER_URL
 
 class SpeechProcessor:
     """A Speech Processor class to handle speech processing related tasks."""
@@ -93,16 +89,16 @@ class AudioGateway(SpeechProcessor):
             logger.error(f"Failed to connect to speaker: {e}")
             self.websocket = None
             
-    def add_microphone(self, device_id: str):
-        self.microphones[device_id] = MicrophoneDevice(device_id)
-        self.microphones[device_id].turn_on()
+    def add_microphone(self, microphone: ControlMicrophone):
+        self.microphones[microphone.device_id] = microphone
+        self.microphones[microphone.device_id].turn_on()
         
     def get_microphone(self, device_id: str):
         return self.microphones.get(device_id, None)
     
-    def add_speaker(self, device_id: str):
-        self.speakers[device_id] = SpeakerDevice(device_id)
-        self.speakers[device_id].turn_on()
+    def add_speaker(self, speaker: ControlSpeaker):
+        self.speakers[speaker.device_id] = speaker
+        self.speakers[speaker.device_id].turn_on()
         
     def get_speaker(self, device_id: str):
         return self.speakers.get(device_id, None)

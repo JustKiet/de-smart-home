@@ -2,9 +2,9 @@ import asyncio
 import websockets
 import keyboard
 from loguru import logger
-from devices.src.smart_devices.microphone_device import MicrophoneDevice
+from backend.devices.microphone_device import MicrophoneDevice
 
-from backend.src.config import MICROPHONE_SERVER_URL
+from backend.config import MICROPHONE_SERVER_URL
 
 async def press_to_talk_client():
     try:

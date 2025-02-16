@@ -1,9 +1,9 @@
 import asyncio
 import websockets
 from fastapi import FastAPI, WebSocket
-from devices.src.smart_devices.microphone_device import MicrophoneDevice
-from devices.src.smart_devices.speaker_device import SpeakerDevice
-from devices.src.gateways.audio_gateway import AudioGateway
+from backend.devices.microphone_device import MicrophoneDevice
+from backend.devices.speaker_device import SpeakerDevice
+from backend.gateways.audio_gateway import AudioGateway
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.websockets import WebSocketDisconnect
 from loguru import logger
@@ -12,8 +12,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import keyboard
 import uvicorn
+import sys
 
-from backend.src.api.routes import microphone, speaker
+from backend.api.routes import microphone, speaker
+from backend.api.routes.speaker import speaker as speaker_device
 
 load_dotenv()
 
@@ -30,12 +32,20 @@ app.add_middleware(
 client = OpenAI()
 
 audio_gateway = AudioGateway(client)
+microphone_device = MicrophoneDevice("1")
 
-audio_gateway.add_microphone("1")
-audio_gateway.add_speaker("1")
+audio_gateway.add_microphone(microphone=microphone_device)
+audio_gateway.add_speaker(speaker=speaker_device)
 
 app.include_router(microphone.router, prefix="/microphone", tags=["Microphone"])
 app.include_router(speaker.router, prefix="/speaker", tags=["Speaker"])
 
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        app, 
+        host="0.0.0.0", 
+        port=8000,
+        log_config=None,
+        log_level="info"
+    )

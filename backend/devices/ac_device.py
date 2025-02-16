@@ -1,4 +1,4 @@
-from devices.src.smart_devices.interfaces.control_ac import ControlAirConditioner
+from backend.devices.interfaces.control_ac import ControlAirConditioner
 from typing import Literal
 
 class ACDevice(ControlAirConditioner):
@@ -10,7 +10,8 @@ class ACDevice(ControlAirConditioner):
         self._humidity = 50
         self._mode: Literal["cool", "heat", "dry", "fan", "auto"] = "auto"
 
-    def get_device_id(self):
+    @property
+    def device_id(self):
         return self._device_id
         
     def is_turned_on(self) -> bool:

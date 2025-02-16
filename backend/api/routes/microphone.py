@@ -3,7 +3,7 @@ import asyncio
 from loguru import logger
 from openai import OpenAI
 import traceback
-from devices.src.gateways.audio_gateway import AudioGateway
+from backend.gateways.audio_gateway import AudioGateway
 from dotenv import load_dotenv
 
 load_dotenv()

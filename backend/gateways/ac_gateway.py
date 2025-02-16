@@ -2,13 +2,12 @@ from abc import ABC, abstractmethod
 from typing import List, Union
 
 # Kiet: Remember to only import the interface, not the implementation.
-from devices.src.smart_devices.interfaces.control_ac import ControlAirConditioner
-from devices.src.gateways.interfaces.manage_ac import ManageAirConditioner
-from devices.src.gateways.interfaces.common.control_gateway import ControlGateway
+from backend.devices.interfaces.control_ac import ControlAirConditioner
+from backend.gateways.interfaces.manage_ac import ManageAirConditioner
+from backend.gateways.interfaces.common.control_gateway import ControlGateway
 
 # TODO: Rework this class.
-class ACGateway(ControlGateway,
-                ManageAirConditioner):
+class ACGateway(ManageAirConditioner):
     def __init__(self, ac_devices: List[ControlAirConditioner]):
         self.ac_devices = {ac_devices.device_id: ac_devices for ac_devices in ac_devices} 
         

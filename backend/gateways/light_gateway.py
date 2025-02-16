@@ -1,9 +1,9 @@
 
 from typing import List, Union
-from devices.src.smart_devices.interfaces.control_light import ControlLight
-from devices.src.gateways.interfaces.common.control_gateway import ControlGateway
-from devices.src.smart_devices.interfaces.common.device_status import DeviceStatus
-from devices.src.smart_devices.interfaces.common.control_power import ControlPower
+from backend.devices.interfaces.control_light import ControlLight
+from backend.gateways.interfaces.common.control_gateway import ControlGateway
+from backend.devices.interfaces.common.device_status import DeviceStatus
+from backend.devices.interfaces.common.control_power import ControlPower
 
 # TODO: Rework this class. Only import the interface, not the implementation.
 class LightGateway:
