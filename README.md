@@ -10,7 +10,7 @@ By distributing intelligence across local AI-powered agents, DeSmartHome enhance
 
 **DeSmartHome** aims to ensure seamless automation, real-time decision-making, and adaptability to dynamic household environments, creating an intelligent and self-sufficient smart home ecosystem.
 
-## Why DeSmartHome?
+## ❓ Why DeSmartHome?
 
 **DeSmartHome** aims to resolve the current problems of Vietnamese Smarthome Market:
 
@@ -18,9 +18,9 @@ By distributing intelligence across local AI-powered agents, DeSmartHome enhance
 - **Security Challenges**: Many Vietnamese smart home solutions rely on cloud-based infrastructure, making them vulnerable to cyber threats, data breaches, and service outages. Additionally, weak encryption standards and a lack of regular security updates expose users to potential hacking risks. A more secure, decentralized approach is needed to protect user data and ensure system reliability. 
 - **Narrow Smart Ecosystem**: Vietnamese smart home companies focus primarily on IoT devices like lighting, security, and appliances, with little integration into broader aspects of daily life such as user productivity, health, or financial management.
 
-**DeSmartHome** addresses key challenges in the Vietnamese smart home market by introducing a decentralized multi-agent system that enhances security, expands compatibility, and enables AI-driven automation. It also integrates blockchain technology for decentralized data storage and secure transactions, ensuring privacy, transparency, and trust. This approach creates a more intelligent, adaptable, and secure smart home environment, moving Vietnam closer to global standards while offering a fully integrated and user-centric smart living experience.                                                                                                                                                                                                                                                  
+**DeSmartHome** addresses key challenges in the Vietnamese smart home market by introducing a decentralized multi-agent system that enhances security, expands compatibility, and enables AI-driven automation. It also integrates blockchain technology for decentralized data storage and secure transactions, ensuring privacy, transparency, and trust. This approach creates a more intelligent, adaptable, and secure smart home environment, moving Vietnam closer to global standards while offering a fully integrated and user-centric smart living experience.
 
-## Project Structure
+## 📃 Project Structure
 
 ```
 de-smart-home/
@@ -98,7 +98,7 @@ de-smart-home/
 └── setup.py
 ```
 
-## Setting up the project
+## ⚙️ Setting up the project
 
 First, clone the project and install the dependencies:
 ```
