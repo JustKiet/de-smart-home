@@ -27,18 +27,29 @@ de-smart-home/
 ├── .gitignore
 ├── README.md
 ├── backend
+│   ├── ai_modules # Contains AI/ML/DL modules
+│   │   ├── __init__.py
+│   │   ├── agents # Agents Core
+│   │   │   ├── __init__.py
+│   │   │   ├── ...
+│   │   ├── speech
+│   │   │   └── __init__.py
+│   │   └── vision
+│   │       └── __init__.py
 │   ├── api
 │   │   ├── __init__.py
-│   │   └── routes -> Contains route handlers that define API endpoints. 
+│   │   └── routes # Contains route handlers that define API endpoints. 
 │   │       ├── __init__.py
-│   │       ├── microphone.py
-│   │       └── speaker.py
-│   ├── clients -> Contains client scripts.
+│   │       ├── ...
+│   ├── clients # Contains client scripts.
 │   │   ├── __init__.py
+│   │   ├── device_control_client.py
 │   │   ├── ptt_client.py
 │   │   └── realtime_client.py
 │   ├── config.py
-│   ├── devices -> Contains device classes definitions.
+│   ├── database # Contains database access objects (DAO)
+│   │   └── __init__.py
+│   ├── devices # Contains device classes definitions and interfaces
 │   │   ├── __init__.py
 │   │   ├── ac_device.py
 │   │   ├── interfaces
@@ -59,7 +70,7 @@ de-smart-home/
 │   │   ├── light_device.py
 │   │   ├── microphone_device.py
 │   │   └── speaker_device.py
-│   ├── gateways -> Contains the core logic for controlling devices and advanced processing/AI modules.
+│   ├── gateways # Contains the core logic for controlling devices and advanced processing
 │   │   ├── __init__.py
 │   │   ├── ac_gateway.py
 │   │   ├── audio_gateway.py
@@ -73,7 +84,15 @@ de-smart-home/
 │   │   │   ├── manage_ac.py
 │   │   │   └── manage_speaker.py
 │   │   └── light_gateway.py
-│   └── main.py
+│   ├── handlers
+│   │   ├── __init__.py
+│   │   └── event_handler.py
+│   ├── main.py
+│   └── utils
+│       ├── __init__.py
+│       └── tool_wrapper.py
+├── frontend
+│   └── README.md
 ├── playground.ipynb
 ├── requirements.txt
 └── setup.py
