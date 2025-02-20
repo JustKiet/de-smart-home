@@ -15,7 +15,9 @@ import uvicorn
 import sys
 
 from backend.api.routes import microphone, speaker
+from backend.api.routes.microphone import microphone as microphone_device
 from backend.api.routes.speaker import speaker as speaker_device
+from backend.api.routes.audio_gateway import audio_gateway
 
 load_dotenv()
 
@@ -28,11 +30,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-client = OpenAI()
-
-audio_gateway = AudioGateway(client)
-microphone_device = MicrophoneDevice("1")
 
 audio_gateway.add_microphone(microphone=microphone_device)
 audio_gateway.add_speaker(speaker=speaker_device)

@@ -5,6 +5,9 @@ from typing import Literal, Optional
 import sounddevice as sd
 import numpy as np
 from loguru import logger
+import io
+import soundfile as sf
+import scipy.signal as sps
 
 class SpeakerDevice(ControlSpeaker):
     def __init__(self, device_id: str):
@@ -68,10 +71,47 @@ class SpeakerDevice(ControlSpeaker):
         self.is_turned_on()
         self._muted = False
         return self.get_status(attribute='muted')
+    
+    def resample_audio(self, wav_bytes, target_sr=16000):
+        """
+        Resamples WAV audio from any sample rate to `target_sr` (default: 16 kHz).
+        
+        Parameters:
+            wav_bytes (bytes): Input WAV audio data as bytes.
+            target_sr (int): Target sample rate (default: 16000 Hz).
+        
+        Returns:
+            bytes: Resampled WAV audio as bytes in PCM 16-bit format.
+        """
+        # Read WAV bytes into NumPy array and detect sample rate
+        with io.BytesIO(wav_bytes) as audio_file:
+            audio_data, orig_sr = sf.read(audio_file, dtype='int16')  # Read as float32 for precision
+
+        if orig_sr == target_sr:
+            return wav_bytes  # No resampling needed
+        
+        # Compute resampling ratio
+        gcd = np.gcd(orig_sr, target_sr)
+        up = target_sr // gcd
+        down = orig_sr // gcd
+        
+        resampled_data = sps.resample_poly(audio_data, up, down).astype(np.int16)
+        
+        with io.BytesIO() as output_file:
+            sf.write(output_file, resampled_data, target_sr, format='WAV', subtype='PCM_16')
+            return output_file.getvalue()
+        
+    def get_sample_rate(self, audio_data):
+        """Extract sample rate from WAV byte data"""
+        with io.BytesIO(audio_data) as audio_file:
+            info = sf.info(audio_file)
+            return info.samplerate
 
     def play_audio(self, audio_data):
         """Play audio using PyAudio with support for pause and mute."""
         self.is_turned_on()
+        
+        audio_data = self.resample_audio(audio_data)
         
         if self._audio_status == 'playing':
             logger.warning("Already playing audio.")
@@ -163,18 +203,23 @@ class SpeakerDevice(ControlSpeaker):
 if __name__ == "__main__":
     from openai import OpenAI
     from dotenv import load_dotenv
+    from pprint import pprint
+    
+    logger.info("Testing SpeakerDevice...")
     
     load_dotenv()
     
     client = OpenAI()
+    
     response = client.audio.speech.create(
         model="tts-1",
         voice="alloy",
         input="Today is a wonderful day to build something people love!",
-        response_format="wav"
+        response_format="wav",
     )
     
     print(type(response.content))
     
     speaker = SpeakerDevice("1")
+    speaker.turn_on()
     speaker.play_audio(response.content)

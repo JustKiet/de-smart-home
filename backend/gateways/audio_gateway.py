@@ -10,9 +10,9 @@ import traceback
 from openai import OpenAI
 import io
 import wave
-
-from backend.config import SPEAKER_SERVER_URL
-
+import httpx
+from fastapi import Response
+import base64
 class SpeechProcessor:
     """A Speech Processor class to handle speech processing related tasks."""
     def __init__(self,
@@ -30,10 +30,10 @@ class SpeechProcessor:
                 frame_rate = wf.getframerate()
                 num_frames = wf.getnframes()
 
-                print(f"Valid WAV File: {num_channels} channels, {sample_width*8}-bit, {frame_rate}Hz, {num_frames} frames")
+                logger.info(f"Valid WAV File: {num_channels} channels, {sample_width*8}-bit, {frame_rate}Hz, {num_frames} frames")
                 return True
         except wave.Error as e:
-            print(f"Invalid WAV File: {e}")
+            logger.error(f"Valid WAV File: {e}")
             return False
 
     def raw_bytes_to_wav(self, raw_audio_bytes, sample_rate=16000, num_channels=1, sample_width=2):
@@ -57,14 +57,13 @@ class SpeechProcessor:
         wav_file.seek(0)  # Move back to start for reading
         return wav_file
     
-    def speech_to_text(self, audio_data):
+    def speech_to_text(self, audio_data) -> str:
         """Convert speech audio data to text using OpenAI's API."""
         response = self.client.audio.transcriptions.create(
             model="whisper-1",
             file=audio_data,
-            response_format="text"
         )
-        return response
+        return response.text
 
 class NamedBytesIO(io.BytesIO):
     def __init__(self, *args, name="audio.wav", **kwargs):
@@ -73,18 +72,21 @@ class NamedBytesIO(io.BytesIO):
 
 class AudioGateway(SpeechProcessor):
     def __init__(self,
-                 client: OpenAI):
+                 client: OpenAI,
+                 assistant_server_url: str = None,
+                 speaker_server_url: str = None):
         super().__init__(client)
         self.microphones = {}
         self.speakers = {}
-        self.speaker_server_url = SPEAKER_SERVER_URL
+        self.assistant_server_url = assistant_server_url
+        self.speaker_server_url = speaker_server_url
         self.websocket = None
 
     async def connect_speaker(self):
         """Establish a persistent WebSocket connection to the speaker."""
         try:
             self.websocket = await websockets.connect(self.speaker_server_url)
-            logger.info(f"Connected to Speaker WebSocket.")
+            logger.info(f"Connected to Speaker WebSocket at: {self.speaker_server_url}")
         except Exception as e:
             logger.error(f"Failed to connect to speaker: {e}")
             self.websocket = None
@@ -103,14 +105,13 @@ class AudioGateway(SpeechProcessor):
     def get_speaker(self, device_id: str):
         return self.speakers.get(device_id, None)
     
-    async def send_audio(self, audio_data: bytes, client: OpenAI):
+    async def send_audio(self, audio_data: bytes):
         """Send audio data to the Speaker WebSocket."""
         if not self.websocket or self.websocket.close_code is not None:
             await self.connect_speaker()
             
         # Write speech processing logic here
-        # -----------------------------------------------------------------------------
-        
+        # ==================================================================================
         # Transform raw PCM audio bytes into a WAV file-like object
         wav_bytes = self.raw_bytes_to_wav(audio_data)
         
@@ -125,19 +126,27 @@ class AudioGateway(SpeechProcessor):
         transcript = self.speech_to_text(wav_file)
         logger.info(f"Transcript: {transcript}")
         
-        # -----------------------------------------------------------------------------
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            assistant_response = await client.post(self.assistant_server_url, json={"message": transcript})
+            assistant_response = assistant_response.json()
+            logger.debug(f"Response Schema: {assistant_response.keys()}")
+            logger.info(f"Assistant Response: {assistant_response['content']}")
+            response_bytes = base64.b64decode(assistant_response["audio"])
         
+        # ==================================================================================
         # Sends the audio data to the speaker through the WebSocket
         if self.websocket:
             try:
-                await self.websocket.send(audio_data)
-                logger.info(f"Sent {len(audio_data)} bytes to Speaker WebSocket")
+                await self.websocket.send(response_bytes)
+                logger.info(f"Sent {len(response_bytes)} bytes to Speaker WebSocket")
             except websockets.exceptions.ConnectionClosed:
                 logger.error(f"Speaker WebSocket closed unexpectedly. Reconnecting...")
                 self.websocket = None
             except Exception as e:
                 traceback.print_exc()
                 logger.error(f"Error sending audio to speaker: {e}")
+                
+            return assistant_response["content"]
                 
     def get_status(self):
         return {
