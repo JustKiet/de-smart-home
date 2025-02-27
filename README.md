@@ -1,4 +1,4 @@
-# 🏙️🤖 DeSmartHome: A Decentralized Multi-Agent Smart Home System
+# 🏙️🤖 DeSmartHome: A Decentralized Multi-Agent Smart Home Ecosystem
 
 ## 🤔 What is DeSmartHome?
 
