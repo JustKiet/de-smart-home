@@ -2,7 +2,7 @@ from typing import Optional, Literal
 from backend.ai_modules.agents.interfaces.base_speech_model import BaseSpeechModel
 from openai import OpenAI
 
-class OpenAIClientSpeech(BaseSpeechModel):
+class OpenAISpeechService(BaseSpeechModel):
     def __init__(self,
                  client: OpenAI,
                  voice: Optional[Literal["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"]] = "nova",

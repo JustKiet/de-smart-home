@@ -1,25 +1,20 @@
-from backend.ai_modules.agents.components.openai_speech_client import OpenAIClientSpeech
+from backend.ai_modules.agents.components.services.openai_speech_service import OpenAISpeechService
+from backend.ai_modules.agents.interfaces.base_speech_model import BaseSpeechModel
 from backend.handlers.event_handler import EventHandler
 from typing import Optional, Literal
 from openai import OpenAI
 import json
 
-class OutputHandler(OpenAIClientSpeech, 
-                    EventHandler):
+class OutputHandler(EventHandler):
     def __init__(self,
-                 client: OpenAI,
-                 voice: Optional[Literal["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"]] = "nova",
+                 speech_client: BaseSpeechModel,
                  *args,
                  **kwargs):
-            OpenAIClientSpeech.__init__(
-                self,
-                client=client,
-                voice=voice,
-            )
+        self.speech_client = speech_client
     
     def handle_output(self, output: str):
         """Handle the output from the AI model."""
-        speech_bytes = self.text_to_speech(output)
+        speech_bytes = self.speech_client.text_to_speech(output)
         return speech_bytes
     
     

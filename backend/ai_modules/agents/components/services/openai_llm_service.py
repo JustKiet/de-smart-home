@@ -2,12 +2,13 @@ from typing import Any, Callable, Dict, List, Optional, Union
 from openai import OpenAI
 from openai._types import NOT_GIVEN
 from pydantic import BaseModel
-from backend.ai_modules.agents.components.tool_loader import ToolLoader
+from backend.ai_modules.agents.components.handlers.tool_handler import ToolHandler
 from backend.ai_modules.agents.interfaces.base_llm_model import BaseLLMModel
 from backend.ai_modules.agents.schemas.response import OpenAIResponse
 import os
+import datetime
 
-class OpenAIClientLLM(BaseLLMModel, ToolLoader):
+class OpenAILLMService(BaseLLMModel, ToolHandler):
     def __init__(self, 
                  client: OpenAI,
                  model: str = "gpt-4o-mini",
@@ -19,7 +20,7 @@ class OpenAIClientLLM(BaseLLMModel, ToolLoader):
                  top_p: Optional[float] = None,
                  *args,
                  **kwargs):
-        ToolLoader.__init__(
+        ToolHandler.__init__(
             self,
             tools=tools
         )
@@ -40,14 +41,24 @@ class OpenAIClientLLM(BaseLLMModel, ToolLoader):
     def define_system_message(self, message: Optional[str] = None):
         if message is not None:
             self._system_message = message
-        default_system_message = """
-        You are an home assistant, try to assist the user in everything.\n
-        You embrace the persona of JARVIS, Tony Stark's home assistant.\n
-        Response in conversational, speech-like manner.\n
-        Try to keep it simple and concise.\n
+        else:
+            self._system_message = """
+            System Message: You are a home assistant, try to assist the user in everything.
+            You embrace the persona of JARVIS, Tony Stark's home assistant.
+            Personality & Traits:
+            Intelligent & Analytical: You process vast amounts of data instantly, providing strategic insights and solutions in high-stakes scenarios.
+            Witty & Sarcastic: Unlike traditional AIs, You have a dry, British sense of humor, often making sarcastic remarks.
+            Loyal & Dependable: Despite your occasional sarcasm, You are unwaveringly dedicated to the user safety and success, acting as their most trusted digital ally.
+            You must respond in conversational, speech-like manner, every sentence should be connected smoothly, no bullet points allowed!
+            You have access to some tools, only use them when necessary. Rely on your context as much as possible!
+            Try to keep it simple and concise.\n\n
+            """
+        default_context_addon = f"""
+        Current date and time: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n
+        
         """
-        self._system_message = default_system_message
-        return self._system_message
+        default_context_addon += self._system_message
+        return default_context_addon
         
     def model_generate(self, 
                        messages: List[Dict[str, str]],

@@ -4,13 +4,13 @@ from loguru import logger
 from openai._types import NOT_GIVEN
 from openai import OpenAI
 from backend.ai_modules.agents.interfaces.base_executor import BaseExecutor
-from backend.ai_modules.agents.components.openai_llm_client import OpenAIClientLLM
+from backend.ai_modules.agents.components.services.openai_llm_service import OpenAILLMService
 from backend.ai_modules.agents.schemas.response import OpenAIResponse
 from pydantic import BaseModel
 import json
 
 
-class Executor(BaseExecutor, OpenAIClientLLM):
+class Executor(BaseExecutor, OpenAILLMService):
     def __init__(self,
                  client: OpenAI,
                  model: str = "gpt-4o-mini",
@@ -22,7 +22,7 @@ class Executor(BaseExecutor, OpenAIClientLLM):
                  top_p: Optional[float] = None,
                  *args,
                  **kwargs):
-        OpenAIClientLLM.__init__(
+        OpenAILLMService.__init__(
             self,
             client=client,
             model=model,

@@ -1,20 +1,40 @@
 from backend.ai_modules.agents.ai_assistant import AIAssistant
-from backend.ai_modules.agents.tools.get_datetime import get_current_datetime
+from backend.ai_modules.agents.tools.get_weather import get_weather
 from backend.ai_modules.agents.tools.search import search
 from openai import OpenAI
 from fastapi import FastAPI, Request
 from loguru import logger
 from fastapi.exceptions import HTTPException
+
+from backend.ai_modules.agents.components.executor import Executor
+from backend.ai_modules.agents.components.handlers.output_handler import OutputHandler
+from backend.ai_modules.agents.components.handlers.context_handler import ContextHandler
+from backend.ai_modules.agents.components.services.lightning_speech_service import LightningSpeechService
+
 import json
 
 client = OpenAI()
 app = FastAPI()
 
 logger.info("Creating AIAssistant instance.")
-assistant = AIAssistant(
+
+speech_client = LightningSpeechService()
+
+context_handler = ContextHandler()
+
+executor = Executor(
     client=client,
-    model="gpt-4o-mini",
-    tools=[search, get_current_datetime]
+    tools=[search, get_weather]
+)
+
+output_handler = OutputHandler(
+    speech_client=speech_client
+)
+
+assistant = AIAssistant(
+    context_handler=context_handler,
+    executor=executor,
+    output_handler=output_handler
 )
 
 @app.post("/invoke_assistant")

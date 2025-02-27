@@ -31,7 +31,7 @@ async def microphone_stream(websocket: WebSocket):
             #logger.info(f"Received {len(data)} bytes of audio data.")
             await asyncio.sleep(0.02)
             #await audio_gateway.send_audio(data)
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=900.0) as client:
                 response = await client.post("http://localhost:8001/send_audio", data=data)
                 #logger.debug(f"Sending {len(data)} {type(data)} of audio data.")
                 logger.info(f"Response: {response}")

@@ -8,7 +8,7 @@ from loguru import logger
 import io
 import soundfile as sf
 import scipy.signal as sps
-
+import base64
 class SpeakerDevice(ControlSpeaker):
     def __init__(self, device_id: str):
         super().__init__()

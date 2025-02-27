@@ -26,14 +26,14 @@ import json
 
 def type_mapper(annotation: str) -> str:
     annotation = annotation.strip().lower()
-
+    
     type_map = {
         "str": "string",
         "int": "integer",
         "float": "number",
         "bool": "boolean",
-        "NoneType": "null",
-        "Set": "array",
+        "nonetype": "null",
+        "set": "array",
         "list": "array",
         "set": "array",
         "dict": "object",
@@ -107,7 +107,7 @@ def get_type_metadata(annotation, description: Optional[str] = None) -> dict:
         }
 
     else:
-        return{
+        return {
             "type": type_mapper(annotation.__name__),
             "description": description,
         }
@@ -156,8 +156,7 @@ def tool(description):
                 if param_type:
                     properties[name] = get_type_metadata(param_type, desc)
 
-            if param.default == inspect.Parameter.empty and param.annotation != _empty:
-                required.append(name)
+            required.append(name)
 
         wrapper.schema = {
             "type": "function",
@@ -168,7 +167,7 @@ def tool(description):
                 "parameters": {
                     "type": "object" if properties else None,
                     "properties": properties if properties else None,
-                    "required": required if required else None,
+                    "required": required if required else [],
                     "additionalProperties": False if properties else None,
                 },
             }
@@ -186,28 +185,27 @@ def get_tools_from_class(cls):
     ]
     return tools
 
-
 if __name__ == "__main__":
     @tool(
         description="Example desc"
     )
     def complex_function(
-        a: Annotated[str | int | float, "Union Type"],
-        b: Annotated[int, "Int type"],
-        c: Annotated[dict[str, Union[int, str]], "Dict type"],
-        d: Annotated[Set[Union[str, int]], "Set type"],
-        e: Annotated[List[Dict[str, Optional[str]]], "List of Dict type"],
-        f: Annotated[Union[float, str, bool], "Complex Union type"],
-        g: Annotated[Union[Dict[str, List[int]], List[Dict[str, str]]], "Union of Dict and List type"],
+        #a: Annotated[str | int | float, "Union Type"],
+        #b: Annotated[int, "Int type"],
+        #c: Annotated[dict[str, Union[int, str]], "Dict type"],
+        #d: Annotated[Set[Union[str, int]], "Set type"],
+        #e: Annotated[List[Dict[str, Optional[str]]], "List of Dict type"],
+        #f: Annotated[Union[float, str, bool], "Complex Union type"],
+        #g: Annotated[Union[Dict[str, List[int]], List[Dict[str, str]]], "Union of Dict and List type"],
         h: Annotated[Optional[Union[Dict[str, int], dict[str, str]]], "Optional type with Union of Dict"],
-        i: Annotated[List[Union[Dict[str, str], Set[str]]], "List of Dict or Set type"],
+        #i: Annotated[List[Union[Dict[str, str], Set[str]]], "List of Dict or Set type"],
         j: Annotated[Optional[List[Dict[str, Union[float, int]]]], "Optional List of Dicts with Union"],
-        k: Annotated[Any, "Any type"],
-        m: Annotated[List[List[int]], "List of List type"],
-        n: Annotated[Literal["a", "b", "c"], "Literal type"],
-        o: Annotated[Literal[1, 2, 3], "Literal type with int"],
-        p: Annotated[bool, "Boolean type"],
+        #k: Annotated[Any, "Any type"],
+        #m: Annotated[List[List[int]], "List of List type"],
+        #n: Annotated[Literal["a", "b", "c"], "Literal type"],
+        #o: Annotated[Literal[1, 2, 3], "Literal type with int"],
+        #p: Annotated[bool, "Boolean type"],
     ):
         pass
 
-    print(complex_function.schema)
+    print(json.dumps(complex_function.schema, indent=2))

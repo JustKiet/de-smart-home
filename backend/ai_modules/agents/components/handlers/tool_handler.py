@@ -1,13 +1,16 @@
 from typing import List, Optional, Callable, Any
 from loguru import logger
 from openai._types import NOT_GIVEN
+import json
 
-class ToolLoader:
+class ToolHandler:
     def __init__(self,
                  tools: Optional[List[Callable[..., Any]]] = NOT_GIVEN,
                  *args,
                  **kwargs):
-        self._tools = [tool.schema for tool in tools] if tools else NOT_GIVEN
+        self._tools = [
+            tool.schema for tool in tools
+        ] if tools else NOT_GIVEN
         self.tools_map = {
             tool.schema["function"]["name"]: tool for tool in tools
         } if tools is not NOT_GIVEN else NOT_GIVEN
