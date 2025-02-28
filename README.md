@@ -2,7 +2,7 @@
 
 ## 🤔 What is DeSmartHome?
 
-**DeSmartHome** is an innovative approach to smart home automation, leveraging a **decentralized multi-agent system** where each room is operated by an independent yet interconnected agent. 
+**DeSmartHome** is an innovative approach to smart home automation, leveraging a **decentralized multi-agent system** where each room is operated by an independent yet interconnected agent.
 
 By distributing intelligence across local AI-powered agents, DeSmartHome enhances reliability, privacy, and responsiveness without relying on a central controller.
 
@@ -15,7 +15,7 @@ By distributing intelligence across local AI-powered agents, DeSmartHome enhance
 **DeSmartHome** aims to resolve the current problems of Vietnamese Smarthome Market:
 
 - **Basic Connectivity**: While the global smart home market is targeting Smart Connectivity, implementing state-of-the-art AI solutions to improve user experiences, Vietnamese Smarthomes Companies are still far behind, only offering basic IoT control and connectivity while lacking intelligent automation, contextual awareness, and adaptive learning. Most systems rely on predefined rules rather than AI-driven decision-making, leading to rigid and less personalized user experiences.
-- **Security Challenges**: Many Vietnamese smart home solutions rely on cloud-based infrastructure, making them vulnerable to cyber threats, data breaches, and service outages. Additionally, weak encryption standards and a lack of regular security updates expose users to potential hacking risks. A more secure, decentralized approach is needed to protect user data and ensure system reliability. 
+- **Security Challenges**: Many Vietnamese smart home solutions rely on cloud-based infrastructure, making them vulnerable to cyber threats, data breaches, and service outages. Additionally, weak encryption standards and a lack of regular security updates expose users to potential hacking risks. A more secure, decentralized approach is needed to protect user data and ensure system reliability.
 - **Narrow Smart Ecosystem**: Vietnamese smart home companies focus primarily on IoT devices like lighting, security, and appliances, with little integration into broader aspects of daily life such as user productivity, health, or financial management.
 
 **DeSmartHome** addresses key challenges in the Vietnamese smart home market by introducing a decentralized multi-agent system that enhances security, expands compatibility, and enables AI-driven automation. It also integrates blockchain technology for decentralized data storage and secure transactions, ensuring privacy, transparency, and trust. This approach creates a more intelligent, adaptable, and secure smart home environment, moving Vietnam closer to global standards while offering a fully integrated and user-centric smart living experience.
@@ -100,8 +100,11 @@ de-smart-home/
 
 ## ⚙️ Setting up the project
 
-First, clone the project and install the dependencies:
+Clone the project and run these Docker scripts:
+
 ```
-pip install -r requirements.txt
+docker build -t de-smart-home .
+docker run --env-file .env -p 8000:8000 -p 8001:8001 -p 8002:8002 -p 8003:8003 de-smart-home
 ```
+
 ==WIP==

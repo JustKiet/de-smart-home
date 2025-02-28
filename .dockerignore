@@ -1,0 +1,28 @@
+# Ignore Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# Ignore virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Ignore logs and temporary files
+*.log
+*.sqlite3
+*.sqlite3-journal
+
+# Ignore Git files
+.git/
+.gitignore
+
+# Ignore build artifacts
+build/
+dist/
+*.egg-info/
+
+# Ignore Jupyter notebooks (if not needed in the container)
+playground.ipynb

@@ -15,7 +15,7 @@ class LightningSpeechService(BaseSpeechModel):
         self.add_wav_header = add_wav_header
         self.sample_rate = sample_rate
         self.speed = speed
-        self.api_key = api_key if api_key else os.getenv("LIGHTNING_API_KEY")
+        self.api_key = api_key if api_key else os.getenv("SMALLEST_API_KEY")
     
     def text_to_speech(self, text: str):
         url = "https://waves-api.smallest.ai/api/v1/lightning/get_speech"
